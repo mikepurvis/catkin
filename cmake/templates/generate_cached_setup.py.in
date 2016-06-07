@@ -17,7 +17,10 @@ except ImportError:
         if os.path.isdir(os.path.join(python_path, 'catkin')):
             sys.path.insert(0, python_path)
             break
-    from catkin.environment_cache import generate_environment_script
+    try:
+        from catkin.environment_cache import generate_environment_script
+    except ImportError:
+        raise ImportError("Unable to import catkin.environment_cache.", "PYTHONPATH=%s" % ";".join(sys.path), "Looked for @CATKIN_GLOBAL_PYTHON_DESTINATION@/catkin in @CATKIN_WORKSPACES@")
 
 code = generate_environment_script('@CATKIN_DEVEL_PREFIX@/env.@script_ext@')
 
