@@ -13,10 +13,12 @@ if(EXISTS "/etc/debian_version")
 endif()
 option(SETUPTOOLS_DEB_LAYOUT "Enable debian style python package layout" ${enable_setuptools_deb_layout})
 
+set(SETUPTOOLS_ARG_EXTRA)
+
 if(SETUPTOOLS_DEB_LAYOUT)
   message(STATUS "Using Debian Python package layout")
   set(PYTHON_PACKAGES_DIR dist-packages)
-  set(SETUPTOOLS_ARG_EXTRA "--install-layout=deb")
+  list(APPEND SETUPTOOLS_ARG_EXTRA "--install-layout=deb")
   # use major version only when installing 3.x with debian layout
   if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
     set(_PYTHON_PATH_VERSION_SUFFIX "${PYTHON_VERSION_MAJOR}")
@@ -26,6 +28,12 @@ else()
   set(PYTHON_PACKAGES_DIR site-packages)
   # setuptools is fussy about windows paths, make sure the install prefix is in native format
   file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" SETUPTOOLS_INSTALL_PREFIX)
+endif()
+
+# Packages which use distutils rather than setuptools will choke on this flag, but they
+# also have the behaviour it specifies by default.
+if(${PROJECT_NAME}_SETUP_MODULE EQUAL setuptools)
+  list(APPEND SETUPTOOLS_ARG_EXTRA "--single-version-externally-managed")
 endif()
 
 if(NOT WIN32)
